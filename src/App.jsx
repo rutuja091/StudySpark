@@ -1,122 +1,148 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+
+import { useMemo, useState } from "react";
+import Navbar from "./components/Navbar";
+import Hero from "./components/Hero";
+import ProductCard from "./components/ProductCard";
+import Footer from "./components/Footer";
+import products from "./data/products";
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("All");
+
+  const categories = [
+    "All",
+    "Programming",
+    "Database",
+    "Web Development",
+    "Interview Preparation",
+  ];
+
+  const filteredProducts = useMemo(() => {
+    return products.filter((product) => {
+      const matchesSearch =
+        product.title.toLowerCase().includes(search.toLowerCase()) ||
+        product.description.toLowerCase().includes(search.toLowerCase());
+
+      const matchesCategory =
+        category === "All" || product.category === category;
+
+      return matchesSearch && matchesCategory;
+    });
+  }, [search, category]);
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div className="app">
+      <Navbar />
+      <Hero />
+
+      <section className="benefits">
+        <div>
+          <span>✦</span>
+          <strong>Easy to Understand</strong>
+          <small>Simple learning resources</small>
         </div>
         <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
+          <span>⌘</span>
+          <strong>Practical Learning</strong>
+          <small>Examples and useful guides</small>
         </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
+        <div>
+          <span>↗</span>
+          <strong>Learn at Your Pace</strong>
+          <small>Resources for beginners</small>
         </div>
       </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      <section className="products-section" id="products">
+        <div className="section-heading">
+          <div>
+            <span className="section-label">THE STUDYSPARK COLLECTION</span>
+            <h2>Explore our resources<span>.</span></h2>
+            <p>Find the right learning material for your next step.</p>
+          </div>
+          <span className="product-count">
+            {filteredProducts.length} PRODUCTS
+          </span>
+        </div>
+
+        <div className="store-controls">
+          <div className="search-box">
+            <span>⌕</span>
+            <input
+              type="search"
+              placeholder="Search notes, guides and resources..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              aria-label="Search products"
+            />
+          </div>
+
+          <div className="category-list">
+            {categories.map((item) => (
+              <button
+                key={item}
+                className={category === item ? "category active" : "category"}
+                onClick={() => setCategory(item)}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {filteredProducts.length > 0 ? (
+          <div className="product-grid">
+            {filteredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        ) : (
+          <div className="empty-state">
+            <span>⌕</span>
+            <h3>No products found</h3>
+            <p>Try another search or choose a different category.</p>
+            <button
+              onClick={() => {
+                setSearch("");
+                setCategory("All");
+              }}
+            >
+              Clear Filters
+            </button>
+          </div>
+        )}
+
+        <p className="store-disclaimer">
+          Sample product listings and prices. Purchase and digital delivery
+          features are not active yet.
+        </p>
+      </section>
+
+      <section className="about-section" id="about">
+        <div className="about-icon">✦</div>
+        <span className="section-label">OUR PURPOSE</span>
+        <h2>Learning should be simple, practical and accessible.</h2>
+        <p>
+          StudySpark is a digital learning store created to help students
+          and beginners explore programming, technology and useful
+          educational resources with confidence.
+        </p>
+      </section>
+
+      <section className="newsletter-section">
+        <span className="section-label">YOUR NEXT STEP STARTS HERE</span>
+        <h2>Keep learning. Keep growing.</h2>
+        <p>Explore resources and make every learning day count.</p>
+        <a href="#products" className="btn-primary">
+          Explore the Store →
+        </a>
+      </section>
+
+      <Footer />
+    </div>
+  );
 }
 
-export default App
+export default App;
